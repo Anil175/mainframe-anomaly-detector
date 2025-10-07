@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+*.log
+.venv/
+env/
+venv/
+*.egg-info/
+
+# TensorFlow model and cache
+app/model/
+*.h5
+*.pb
+*.joblib
+
+# Data files
+app/data/*.csv
+app/data/*.json
+
+# Docker
+*.pid
+*.sock
+*.tar
+*.log
+docker-compose.override.yml
+
+# macOS system files
+.DS_Store
+
+# Ansible cache
+*.retry
+__pycache__/
