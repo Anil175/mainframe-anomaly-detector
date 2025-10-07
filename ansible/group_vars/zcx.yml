@@ -1,0 +1,11 @@
+
+---
+zcx_user: root
+app_path: /opt/mainframe_anomaly
+docker_image_name: mainframe/anomaly:latest
+
+zosmf:
+  host: "zos.example.com"
+  user: "zos_user"
+  password: "zos_password"
+  verify_ssl: false

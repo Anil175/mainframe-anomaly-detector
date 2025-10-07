@@ -1,0 +1,38 @@
+
+---
+- name: Deploy anomaly app to zCX host
+  hosts: zcx
+  become: true
+  tasks:
+    - name: Ensure app dir exists
+      file:
+        path: "{{ app_path }}"
+        state: directory
+        mode: '0755'
+
+    - name: Copy app files
+      copy:
+        src: ../app/
+        dest: "{{ app_path }}/"
+        owner: root
+        mode: '0755'
+
+    - name: Build docker image
+      docker_image:
+        build:
+          path: "{{ app_path }}"
+        name: "{{ docker_image_name }}"
+        tag: latest
+        state: present
+
+    - name: Run container
+      docker_container:
+        name: mainframe-anomaly
+        image: "{{ docker_image_name }}"
+        state: started
+        restart_policy: always
+        ports:
+          - "8080:8080"
+        volumes:
+          - "{{ app_path }}/data:/app/data"
+          - "{{ app_path }}/model:/app/model"

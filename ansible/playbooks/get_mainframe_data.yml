@@ -1,0 +1,22 @@
+
+---
+- name: Fetch mainframe metrics via z/OSMF (template)
+  hosts: mainframe
+  gather_facts: no
+  tasks:
+    - name: Query z/OSMF metrics endpoint (example)
+      uri:
+        url: "https://{{ zosmf.host }}/zosmf/metrics"
+        method: GET
+        user: "{{ zosmf.user }}"
+        password: "{{ zosmf.password }}"
+        validate_certs: "{{ zosmf.verify_ssl }}"
+        return_content: yes
+      register: mf_resp
+      ignore_errors: yes
+
+    - name: Write metrics to file on z/OS (or transfer to zCX)
+      copy:
+        content: "{{ mf_resp.content }}"
+        dest: /tmp/mainframe_metrics.json
+      when: mf_resp is defined and mf_resp.content is defined

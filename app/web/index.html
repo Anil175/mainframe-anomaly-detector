@@ -1,0 +1,45 @@
+
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Mainframe Anomaly Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <h1>Mainframe Anomaly Dashboard</h1>
+  <div>
+    <canvas id="anomalyChart" width="800" height="300"></canvas>
+  </div>
+  <div id="log"></div>
+
+  <script>
+    const ctx = document.getElementById('anomalyChart').getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'scatter',
+      data: { datasets: [{label: 'Anomalies (recon error)', data: []}]},
+      options: {
+        scales: {
+          x: {type: 'time', time: {parser: 'ISO', unit: 'minute'}},
+          y: {title: {display:true, text: 'Reconstruction Error'}}
+        }
+      }
+    });
+
+    const ws = new WebSocket(`ws://${location.host}/ws`);
+    ws.onopen = () => { addLog("WebSocket connected"); };
+    ws.onmessage = (evt) => {
+      const msg = JSON.parse(evt.data);
+      if(msg.type === "anomaly" || msg.timestamp){
+        addPoint(msg.timestamp, msg.recon_error);
+        addLog("Anomaly at " + msg.timestamp + " error=" + msg.recon_error.toFixed(4));
+      }
+    };
+    function addPoint(ts, val){
+      chart.data.datasets[0].data.push({x:ts, y: val});
+      chart.update();
+    }
+    function addLog(t){ document.getElementById('log').innerHTML = (new Date()).toLocaleTimeString() + " - " + t + "<br>" + document.getElementById('log').innerHTML; }
+  </script>
+</body>
+</html>
